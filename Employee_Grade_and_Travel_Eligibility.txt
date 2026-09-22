@@ -1,0 +1,22 @@
+【TechNova 員工職級與差旅資格】
+
+1. Jefferson
+   - 職稱：Cloud Architect
+   - 職級：一般員工
+   - 所屬部門：Cloud Engineering
+   - 2026 年主要負責：企業核心系統雲端遷移專案
+
+2. Miss A
+   - 職稱：Engineering Manager
+   - 職級：經理級
+   - 所屬部門：Cloud Engineering
+
+3. Mr. A
+   - 職稱：Technical Director
+   - 職級：資深技術總監
+   - 所屬部門：Technology
+
+差旅資格：
+- 一般員工依一般員工差旅標準辦理。
+- 經理級以上依管理職差旅標準辦理。
+- 特殊交通與住宿需求須依差旅政策辦理。

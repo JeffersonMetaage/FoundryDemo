@@ -1,0 +1,15 @@
+【TechNova 企業核心系統雲端遷移專案計劃書 (2026 Q3-Q4)】
+
+1. 專案目標與範圍：
+   - 本專案旨在將企業地端 SQL Server 及 Legacy Web App 遷移至 Microsoft Azure，並建置 Azure Landing Zone。
+   - 預計採用服務：Azure Kubernetes Service (AKS), Azure SQL Database, Azure Front Door, Azure AI Foundry。
+
+2. 時程與關鍵里程碑：
+   - Q3 (7月-8月)：完成架構設計與 PoC 驗證，建立 IaC (Terraform) 自動化部署腳本。
+   - Q3 (9月)：系統正式切換，執行 Azure Site Recovery (ASR) 演練。
+   - Q4 (10月)：上線後營運維護與專案結案。
+
+3. 專案團隊與權責：
+   - 專案總負責人：Jefferson (雲端架構師)
+   - 預算審核人：資深技術總監
+   - 預計總預算：USD $50,000（含 Azure 訂閱算力與顧問費用）
