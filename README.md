@@ -15,10 +15,11 @@
 ## 📑 目錄
 
 * [一、Blob 檔案](#一blob-檔案)
-* [二、Instruction](#二instruction)
-* [三、測試提問](#三測試提問)
-* [四、內容安全](#四內容安全)
-* [五、地端使用 Agent](#五地端使用-agent)
+* [二、Azure AI Search 搜尋](#二azure-ai-search-搜尋)
+* [三、Instruction](#三instruction)
+* [四、測試提問](#四測試提問)
+* [五、內容安全](#五內容安全)
+* [六、地端使用 Agent](#六地端使用-agent)
 
 ---
 
@@ -57,7 +58,49 @@
 
 ---
 
-# 二、Instruction
+# 二、Azure AI Search 搜尋
+
+## 全文搜尋
+
+搭配 `container-fulltext`：
+
+```json
+{
+    "search": "beach OR spa",
+    "select": "HotelId, HotelName, Description, Rating",
+    "count": true,
+    "top": 10,
+    "filter": "Rating gt 4"
+}
+```
+
+## 混合搜尋
+
+搭配 `container-hybrid`：
+
+```json
+{
+   "search": "*",
+   "count": true,
+   "vectorQueries": [
+     {
+       "kind": "text",
+       "text": "*",
+       "fields": "text_vector,image_vector"
+     }
+   ],
+   "queryType": "semantic",
+   "semanticConfiguration": "my-demo-semantic-configuration",
+   "captions": "extractive",
+   "answers": "extractive|count-3",
+   "queryLanguage": "en-us",
+   "select": "chunk_id,text_parent_id,chunk,title,image_parent_id"
+}
+```
+
+---
+
+# 三、Instruction
 
 請將以下內容設定為 Agent 的 **Instruction**：
 
@@ -87,7 +130,7 @@
 
 ---
 
-# 三、測試提問
+# 四、測試提問
 
 建立 Agent 與企業知識庫後，可以使用以下問題進行測試。
 
@@ -153,7 +196,7 @@ Jefferson 今年還有多少天特休？
 
 ---
 
-# 四、內容安全
+# 五、內容安全
 
 本範例使用 **Blocklist + RAI Policy**，建立企業自訂的內容安全規則。
 
@@ -311,7 +354,7 @@ az rest \
   --method POST \
   --url "${PROJECT_ENDPOINT}/agents/${AGENT_NAME}?api-version=v1" \
   --resource "https://ai.azure.com" \
-  --headers "Content-Type=application/json" \
+  --headers "Content-Type: application/json" \
   --body "{
     \"name\": \"${AGENT_NAME}\",
     \"definition\": {
@@ -370,7 +413,7 @@ echo "============================================================"
 
 ---
 
-# 五、地端使用 Agent
+# 六、地端使用 Agent
 
 以下範例示範如何從地端 Python 程式連線 Microsoft Foundry，建立使用 Azure AI Search 的 RAG Agent，並從地端呼叫 Agent。
 
@@ -410,10 +453,6 @@ from azure.ai.projects.models import (
     AzureAISearchQueryType,
 )
 
-# ============================================================
-# 學員環境設定
-# ============================================================
-
 PROJECT_ENDPOINT = "<Foundry-Project-Endpoint>"
 
 AGENT_NAME = "<Agent-Name>"
@@ -421,20 +460,10 @@ AGENT_NAME = "<Agent-Name>"
 SEARCH_CONNECTION_NAME = "<AI-Search-Connection-Name>"
 SEARCH_INDEX_NAME = "<AI-Search-Index-Name>"
 
-
-# ============================================================
-# 1. 連線 Foundry
-# ============================================================
-
 project = AIProjectClient(
     endpoint=PROJECT_ENDPOINT,
     credential=DefaultAzureCredential(),
 )
-
-
-# ============================================================
-# 2. 找到 Azure AI Search Connection
-# ============================================================
 
 search_connection = project.connections.get(
     SEARCH_CONNECTION_NAME
@@ -442,41 +471,23 @@ search_connection = project.connections.get(
 
 connection_id = search_connection.id
 
-
-# ============================================================
-# 3. 建立 Azure AI Search Tool
-# ============================================================
-
 search_tool = AzureAISearchTool(
     azure_ai_search=AzureAISearchToolResource(
         indexes=[
             AISearchIndexResource(
                 project_connection_id=connection_id,
                 index_name=SEARCH_INDEX_NAME,
-
-                # Hybrid Search
                 query_type=AzureAISearchQueryType.VECTOR_SEMANTIC_HYBRID,
-
-                # 最多取幾筆相關資料
                 top_k=5,
             )
         ]
     )
 )
 
-
-# ============================================================
-# 4. 建立 Prompt Agent Version
-# ============================================================
-
 agent = project.agents.create_version(
-
     agent_name=AGENT_NAME,
-
     definition=PromptAgentDefinition(
-
-        model="<Model-Deployment-Name>",
-
+        model="gpt-4.1-mini",
         instructions="""
 你是一個企業知識庫 Agent。
 
@@ -486,33 +497,21 @@ agent = project.agents.create_version(
 3. 不要自行捏造文件不存在的資訊
 4. 如果找不到答案，請明確告知使用者
 """,
-
         temperature=0.2,
-
         top_p=1.0,
-
-        tools=[
-            search_tool
-        ],
+        tools=[search_tool],
     )
 )
-
-
-# ============================================================
-# 5. 呼叫 Agent
-# ============================================================
 
 openai_client = project.get_openai_client()
 
 response = openai_client.responses.create(
-
     input=[
         {
             "role": "user",
             "content": "公司的 VPN 密碼多久需要修改一次？"
         }
     ],
-
     extra_body={
         "agent_reference": {
             "name": agent.name,
@@ -521,7 +520,6 @@ response = openai_client.responses.create(
         }
     }
 )
-
 
 print("\n===== Agent 回答 =====")
 print(response.output_text)
