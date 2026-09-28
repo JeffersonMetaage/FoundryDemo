@@ -1,5 +1,11 @@
 # Microsoft Foundry Lab
 
+帳號
+
+https://docs.google.com/spreadsheets/d/1RpEGLw8AtlT-zy2cEeUF0QoqScj87CYa/edit?usp=sharing&ouid=112769022992227898830&rtpof=true&sd=true
+
+---
+
 本 Lab 示範 Microsoft Foundry 在企業 AI 情境中的應用，包含：
 
 * 企業知識庫與 RAG
@@ -243,6 +249,7 @@ RESOURCE_GROUP="<Resource-Group>"
 FOUNDRY_ACCOUNT="<Foundry-Account>"
 PROJECT_NAME="<Project-Name>"
 AGENT_NAME="<Agent-Name>"
+MODEL_NAME="<Model-Name>"
 
 BLOCKLIST_NAME="<Blocklist-Name>"
 BLOCKLIST_ITEM_NAME="<Blocklist-Item-Name>"
@@ -359,7 +366,7 @@ az rest \
     \"name\": \"${AGENT_NAME}\",
     \"definition\": {
       \"kind\": \"prompt\",
-      \"model\": \"gpt-4.1\",
+      \"model\": \"${MODEL_NAME}\",
       \"instructions\": \"You are a simple enterprise policy assistant. Answer questions about company policies clearly and directly.\",
       \"rai_config\": {
         \"rai_policy_name\": \"${RAI_POLICY_ID}\"
@@ -398,6 +405,7 @@ echo "Blocklist Item: ${BLOCKLIST_ITEM_NAME}"
 echo "Blocked Text  : ${BLOCKLIST_PATTERN}"
 echo "RAI Policy    : ${POLICY_NAME}"
 echo "Agent         : ${AGENT_NAME}"
+echo "Model         : ${MODEL_NAME}"
 
 echo ""
 echo "============================================================"
